@@ -1,0 +1,23 @@
+{
+  "name": "fullstack-backend",
+  "version": "1.0.0",
+  "description": "Full Stack open backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janijuv/fullstack-backend.git"
+  },
+  "author": "Jani Juvonen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/janijuv/fullstack-backend/issues"
+  },
+  "homepage": "https://github.com/janijuv/fullstack-backend#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
