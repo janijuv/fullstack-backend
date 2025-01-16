@@ -1,8 +1,12 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+const cors = require('cors')
 
+app.use(cors())
+app.use(express.static('dist'))
 app.use(express.json())
+
 let persons = [
     { 
       "name": "Arto Hellas", 
@@ -29,7 +33,6 @@ let persons = [
 app.get('/', (request, response) => {
   response.send('<h1>Hello world!</h1>')
 })
-
 app.get('/info', (request, response) => {
   response.send('<p>Phonebook has info for ' + JSON.stringify(persons.length) +
    ' people<br/>' +  new Date().toDateString())
@@ -42,7 +45,11 @@ app.get('/api/persons', (request, response) => {
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
   const person = persons.find(person => person.id === id)
-  response.json(person);
+  if (person) {
+    response.json(person);
+  } else {
+    response.status(404).end();
+  }
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -55,20 +62,13 @@ const generateId = () => {
   const id = persons.length > 0 
     ? Math.max(...persons.map(n => n.id))+1
     : 0
-  console.log(id);
-  return id;
+  return id.toString();
 }
 
 app.post('/api/persons', (request, response) => {
   const body = request.body;
-  let randomId;
-/*  do {
-    randomId = generateId();
-  } while (persons.includes(person => person.id === randomId));*/
   const existingPerson = persons.includes(p => p.name === request.body.name)
-  console.log("existing", existingPerson)
-  console.log("person", persons)
-
+  
   if (!request.body.name) {
     return response.status(400).json({
       error: "name missing"
@@ -80,9 +80,7 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
     id: generateId()
   }
-
-  persons = persons.concat(person);
-   
+  
   if (existingPerson) {
     return response.status(400).json({
       error: "name must be unique"
@@ -104,7 +102,7 @@ app.post('/api/persons', (request, response) => {
 
 app.use(morgan('tiny'));
 
-
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
