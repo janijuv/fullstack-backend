@@ -25,8 +25,19 @@ const person = new Person({
     "number": process.argv[4],
   })
 
+  console.log("arg0", process.argv[0]);
+  console.log("argv1", process.argv[1]);
 
-person.save().then(result => {
-  console.log('Added', process.argv[3], 'number', process.argv[4], 'to phonebook')
-  mongoose.connection.close()
-})
+if (process.argv.length==3) {
+  Person.find({}).then(result => {
+    result.forEach(person => {
+      console.log(person);
+      mongoose.connection.close();
+    })
+  })
+} else {
+  person.save().then(result => {
+    console.log('Added', process.argv[3], 'number', process.argv[4], 'to phonebook')
+    mongoose.connection.close()
+  })
+}
