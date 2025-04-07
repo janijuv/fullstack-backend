@@ -24,7 +24,7 @@ const person = new Person({
     "name": process.argv[3], 
     "number": process.argv[4],
   })
-
+  
   console.log("arg0", process.argv[0]);
   console.log("argv1", process.argv[1]);
 
