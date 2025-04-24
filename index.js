@@ -58,7 +58,7 @@ const generateId = () => {
   return id.toString();
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   if (!request.body.name) {
     return response.status(400).json({
       error: "name missing"
@@ -69,12 +69,18 @@ app.post('/api/persons', (request, response) => {
       error: "name missing"
     })
   }
+  if (request.body.name.length < 3) {
+    console.log("lt 3");
+    console.log(request.error)
+    return response.status(400).json({
+      error: "name too short"
+    })
+  }
   if (request.body.number.length === 0) {
     return response.status(400).json({
       error: "number missing"
     })
   }
- 
   const p = new Person({
     name: request.body.name,
     number: request.body.number,
@@ -83,7 +89,8 @@ app.post('/api/persons', (request, response) => {
 
   p.save().then(savedPerson => {
     response.json(savedPerson);
-  })  
+  })
+  .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -95,10 +102,8 @@ app.put('/api/persons/:id', (request, response, next) => {
       if (!person) {
         return response.status(404).end()
       }
-
       person.name = name
       person.number = number
-      
       return person.save().then((updatedPerson) => {
         response.json(updatedPerson)
       })
@@ -114,6 +119,8 @@ const errorhandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name == 'CastError') {
     return response.status(400).send({error: 'malformatted id'})
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })  
   }
   next(error)
 }
